@@ -61,6 +61,8 @@ app.use(
   swaggerUi.setup(swaggerDocs),
 );
 
+//TEST WORKFLOW
+
 // Routes
 app.use("/products", productRoutes);
 
