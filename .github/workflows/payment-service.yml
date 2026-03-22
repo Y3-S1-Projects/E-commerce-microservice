@@ -1,0 +1,38 @@
+name: Payment Service CI
+
+on:
+  push:
+    paths:
+      - 'payment-service/**'
+      - '.github/workflows/payment-service.yml'
+  pull_request:
+    paths:
+      - 'payment-service/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: payment-service
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: payment-service/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+

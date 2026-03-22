@@ -1,0 +1,38 @@
+name: API Gateway CI
+
+on:
+  push:
+    paths:
+      - 'api-gateway/**'
+      - '.github/workflows/api-gateway.yml'
+  pull_request:
+    paths:
+      - 'api-gateway/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: api-gateway
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: api-gateway/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
