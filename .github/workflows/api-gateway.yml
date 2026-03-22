@@ -16,17 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for changes
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            changed:
-              - 'api-gateway/**'
-              - '.github/workflows/api-gateway.yml'
-
       - name: Setup Node.js
-        if: steps.filter.outputs.changed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -34,13 +24,11 @@ jobs:
           cache-dependency-path: api-gateway/package-lock.json
 
       - name: Install dependencies
-        if: steps.filter.outputs.changed == 'true'
         run: npm install
 
       - name: Run linter
-        if: steps.filter.outputs.changed == 'true'
         run: npm run lint
 
       - name: Build
-        if: steps.filter.outputs.changed == 'true' && always()
+        if: always()
         run: npm run build
