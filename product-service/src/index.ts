@@ -15,14 +15,6 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI as string)
-  .then(() => console.log("Product Service: Connected to MongoDB"))
-  .catch((err) =>
-    console.error("Product Service: MongoDB connection error:", err),
-  );
-
 // Swagger Configuration
 const swaggerOptions: swaggerJsdoc.Options = {
   definition: {
@@ -30,8 +22,7 @@ const swaggerOptions: swaggerJsdoc.Options = {
     info: {
       title: "Product Service API",
       version: "1.0.0",
-      description:
-        "Microservice for managing products in the e-commerce platform",
+      description: "Microservice for managing products in the e-commerce platform",
     },
     servers: [
       {
@@ -50,18 +41,8 @@ const swaggerOptions: swaggerJsdoc.Options = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 // Swagger UI — Direct access & via API Gateway
-app.use(
-  "/api-docs",
-  swaggerUi.serveFiles(swaggerDocs),
-  swaggerUi.setup(swaggerDocs),
-);
-app.use(
-  "/products/api-docs",
-  swaggerUi.serveFiles(swaggerDocs),
-  swaggerUi.setup(swaggerDocs),
-);
-
-//TEST WORKFLOW
+app.use("/api-docs", swaggerUi.serveFiles(swaggerDocs), swaggerUi.setup(swaggerDocs));
+app.use("/products/api-docs", swaggerUi.serveFiles(swaggerDocs), swaggerUi.setup(swaggerDocs));
 
 // Routes
 app.use("/products", productRoutes);
@@ -71,8 +52,17 @@ app.get("/health", (_req, res) => {
   res.json({ service: "Product Service", status: "UP", port: PORT });
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Product Service running on http://localhost:${PORT}`);
-  console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
-});
+// MongoDB Connection & Server Start (skip in test mode)
+if (process.env.NODE_ENV !== "test") {
+  mongoose
+    .connect(process.env.MONGO_URI as string)
+    .then(() => console.log("Product Service: Connected to MongoDB"))
+    .catch((err) => console.error("Product Service: MongoDB connection error:", err));
+
+  app.listen(PORT, () => {
+    console.log(`Product Service running on http://localhost:${PORT}`);
+    console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
+  });
+}
+
+export default app;

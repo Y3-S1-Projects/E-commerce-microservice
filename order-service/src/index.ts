@@ -1,12 +1,12 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import swaggerJsdoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
-import orderRoutes from './routes/orderRoutes';
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import orderRoutes from "./routes/orderRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 3003;
@@ -15,60 +15,54 @@ const PORT = process.env.PORT || 3003;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI as string)
-  .then(() => console.log('Order Service: Connected to MongoDB'))
-  .catch((err) =>
-    console.error('Order Service: MongoDB connection error:', err)
-  );
-
 // Swagger Configuration
 const swaggerOptions: swaggerJsdoc.Options = {
   definition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'Order Service API',
-      version: '1.0.0',
-      description:
-        'Microservice for managing orders in the e-commerce platform',
+      title: "Order Service API",
+      version: "1.0.0",
+      description: "Microservice for managing products in the e-commerce platform",
     },
     servers: [
       {
-        url: process.env.APP_URL || `http://localhost:${PORT}`,
-        description: 'Direct Access',
+        url: process.env.APP_URL || "http://localhost:" + PORT,
+        description: "Direct Access",
       },
       {
-        url: process.env.GATEWAY_URL || 'http://localhost:3000',
-        description: 'Via API Gateway',
+        url: process.env.GATEWAY_URL || "http://localhost:3000",
+        description: "Via API Gateway",
       },
     ],
   },
-  apis: ['./src/routes/*.ts'],
+  apis: ["./src/routes/*.ts"],
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use(
-  '/api-docs',
-  swaggerUi.serveFiles(swaggerDocs),
-  swaggerUi.setup(swaggerDocs)
-);
-app.use(
-  '/orders/api-docs',
-  swaggerUi.serveFiles(swaggerDocs),
-  swaggerUi.setup(swaggerDocs)
-);
+
+// Swagger UI Support
+app.use("/api-docs", swaggerUi.serveFiles(swaggerDocs), swaggerUi.setup(swaggerDocs));
+app.use("/orders/api-docs", swaggerUi.serveFiles(swaggerDocs), swaggerUi.setup(swaggerDocs));
 
 // Routes
-app.use('/orders', orderRoutes);
+app.use("/orders", orderRoutes);
 
 // Health Check
-app.get('/health', (_req, res) => {
-  res.json({ service: 'Order Service', status: 'UP', port: PORT });
+app.get("/health", (_req, res) => {
+  res.json({ service: "Order Service", status: "UP", port: PORT });
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Order Service running on http://localhost:${PORT}`);
-  console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
-});
+// MongoDB Connection & Server Start (skip in test mode)
+if (process.env.NODE_ENV !== "test") {
+  mongoose
+    .connect(process.env.MONGO_URI as string)
+    .then(() => console.log("Order Service: Connected to MongoDB"))
+    .catch((err) => console.error("Order Service: MongoDB connection error:", err));
+
+  app.listen(PORT, () => {
+    console.log("Order Service running on http://localhost:" + PORT);
+    console.log("Swagger Docs: http://localhost:" + PORT + "/api-docs");
+  });
+}
+
+export default app;

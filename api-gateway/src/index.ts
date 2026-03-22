@@ -96,14 +96,18 @@ app.get("/health", (_req: Request, res: Response) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
-  console.log(`\n${"=".repeat(60)}`);
-  console.log(`  API Gateway running on http://localhost:${PORT}`);
-  console.log(`${"=".repeat(60)}`);
-  console.log(`\n  Connected Microservices:`);
-  Object.entries(services).forEach(([name, url]) => {
-    console.log(`    - ${name.padEnd(12)} -> ${url}`);
-    console.log(`      Swagger: http://localhost:${PORT}/${name}/api-docs`);
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => {
+    console.log(`\n${"=".repeat(60)}`);
+    console.log(`  API Gateway running on http://localhost:${PORT}`);
+    console.log(`${"=".repeat(60)}`);
+    console.log(`\n  Connected Microservices:`);
+    Object.entries(services).forEach(([name, url]) => {
+      console.log(`    - ${name.padEnd(12)} -> ${url}`);
+      console.log(`      Swagger: http://localhost:${PORT}/${name}/api-docs`);
+    });
+    console.log(`\n${"=".repeat(60)}\n`);
   });
-  console.log(`\n${"=".repeat(60)}\n`);
-});
+}
+
+export default app;

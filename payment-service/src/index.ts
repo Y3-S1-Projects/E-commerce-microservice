@@ -15,14 +15,6 @@ const PORT = process.env.PORT || 3004;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI as string)
-  .then(() => console.log("Payment Service: Connected to MongoDB"))
-  .catch((err) =>
-    console.error("Payment Service: MongoDB connection error:", err),
-  );
-
 // Swagger Configuration
 const swaggerOptions: swaggerJsdoc.Options = {
   definition: {
@@ -30,12 +22,11 @@ const swaggerOptions: swaggerJsdoc.Options = {
     info: {
       title: "Payment Service API",
       version: "1.0.0",
-      description:
-        "Microservice for managing payments in the e-commerce platform",
+      description: "Microservice for managing products in the e-commerce platform",
     },
     servers: [
       {
-        url: process.env.APP_URL || `http://localhost:${PORT}`,
+        url: process.env.APP_URL || "http://localhost:" + PORT,
         description: "Direct Access",
       },
       {
@@ -48,16 +39,10 @@ const swaggerOptions: swaggerJsdoc.Options = {
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use(
-  "/api-docs",
-  swaggerUi.serveFiles(swaggerDocs),
-  swaggerUi.setup(swaggerDocs),
-);
-app.use(
-  "/payments/api-docs",
-  swaggerUi.serveFiles(swaggerDocs),
-  swaggerUi.setup(swaggerDocs),
-);
+
+// Swagger UI Support
+app.use("/api-docs", swaggerUi.serveFiles(swaggerDocs), swaggerUi.setup(swaggerDocs));
+app.use("/payments/api-docs", swaggerUi.serveFiles(swaggerDocs), swaggerUi.setup(swaggerDocs));
 
 // Routes
 app.use("/payments", paymentRoutes);
@@ -67,8 +52,17 @@ app.get("/health", (_req, res) => {
   res.json({ service: "Payment Service", status: "UP", port: PORT });
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Payment Service running on http://localhost:${PORT}`);
-  console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
-});
+// MongoDB Connection & Server Start (skip in test mode)
+if (process.env.NODE_ENV !== "test") {
+  mongoose
+    .connect(process.env.MONGO_URI as string)
+    .then(() => console.log("Payment Service: Connected to MongoDB"))
+    .catch((err) => console.error("Payment Service: MongoDB connection error:", err));
+
+  app.listen(PORT, () => {
+    console.log("Payment Service running on http://localhost:" + PORT);
+    console.log("Swagger Docs: http://localhost:" + PORT + "/api-docs");
+  });
+}
+
+export default app;

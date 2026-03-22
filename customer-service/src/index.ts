@@ -15,14 +15,6 @@ const PORT = process.env.PORT || 3002;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI as string)
-  .then(() => console.log("Customer Service: Connected to MongoDB"))
-  .catch((err) =>
-    console.error("Customer Service: MongoDB connection error:", err),
-  );
-
 // Swagger Configuration
 const swaggerOptions: swaggerJsdoc.Options = {
   definition: {
@@ -30,12 +22,11 @@ const swaggerOptions: swaggerJsdoc.Options = {
     info: {
       title: "Customer Service API",
       version: "1.0.0",
-      description:
-        "Microservice for managing customers in the e-commerce platform",
+      description: "Microservice for managing products in the e-commerce platform",
     },
     servers: [
       {
-        url: process.env.APP_URL || `http://localhost:${PORT}`,
+        url: process.env.APP_URL || "http://localhost:" + PORT,
         description: "Direct Access",
       },
       {
@@ -48,16 +39,10 @@ const swaggerOptions: swaggerJsdoc.Options = {
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use(
-  "/api-docs",
-  swaggerUi.serveFiles(swaggerDocs),
-  swaggerUi.setup(swaggerDocs),
-);
-app.use(
-  "/customers/api-docs",
-  swaggerUi.serveFiles(swaggerDocs),
-  swaggerUi.setup(swaggerDocs),
-);
+
+// Swagger UI Support
+app.use("/api-docs", swaggerUi.serveFiles(swaggerDocs), swaggerUi.setup(swaggerDocs));
+app.use("/customers/api-docs", swaggerUi.serveFiles(swaggerDocs), swaggerUi.setup(swaggerDocs));
 
 // Routes
 app.use("/customers", customerRoutes);
@@ -67,8 +52,17 @@ app.get("/health", (_req, res) => {
   res.json({ service: "Customer Service", status: "UP", port: PORT });
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Customer Service running on http://localhost:${PORT}`);
-  console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
-});
+// MongoDB Connection & Server Start (skip in test mode)
+if (process.env.NODE_ENV !== "test") {
+  mongoose
+    .connect(process.env.MONGO_URI as string)
+    .then(() => console.log("Customer Service: Connected to MongoDB"))
+    .catch((err) => console.error("Customer Service: MongoDB connection error:", err));
+
+  app.listen(PORT, () => {
+    console.log("Customer Service running on http://localhost:" + PORT);
+    console.log("Swagger Docs: http://localhost:" + PORT + "/api-docs");
+  });
+}
+
+export default app;
