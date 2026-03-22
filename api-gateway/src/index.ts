@@ -87,7 +87,7 @@ app.get("/", (_req: Request, res: Response) => {
 
 // Health Check
 app.get("/health", (_req: Request, res: Response) => {
-  res.jso({
+  res.json({
     service: "API Gateway",
     status: "UP",
     port: PORT,
