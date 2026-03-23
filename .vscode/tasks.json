@@ -1,0 +1,63 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "API Gateway",
+            "type": "shell",
+            "command": "cd api-gateway && npm start",
+            "problemMatcher": []
+        },
+        {
+            "label": "Product Service",
+            "type": "shell",
+            "command": "cd product-service && npm start",
+            "problemMatcher": []
+        },
+        {
+            "label": "Customer Service",
+            "type": "shell",
+            "command": "cd customer-service && npm start",
+            "problemMatcher": []
+        },
+        {
+            "label": "Order Service",
+            "type": "shell",
+            "command": "cd order-service && npm start",
+            "problemMatcher": []
+        },
+        {
+            "label": "Payment Service",
+            "type": "shell",
+            "command": "cd payment-service && npm start",
+            "problemMatcher": []
+        },
+        {
+            "label": "Start All Services (VS Code Terminal)",
+            "dependsOn": [
+                "API Gateway",
+                "Product Service",
+                "Customer Service",
+                "Order Service",
+                "Payment Service"
+            ],
+            "dependsOrder": "parallel",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Stop All Services (Kill Processes)",
+            "type": "shell",
+            "command": "${workspaceFolder}\\stop-all.bat",
+            "problemMatcher": []
+        },
+        {
+            "label": "Start All Services (External Windows)",
+            "type": "shell",
+            "command": "${workspaceFolder}\\start-all.bat",
+            "problemMatcher": []
+        }
+    ]
+}

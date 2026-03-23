@@ -100,6 +100,10 @@ async function fetchServiceData(service) {
   }
 }
 
+function formatPrice(amount) {
+  return Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 function renderRow(serviceName, item) {
   switch (serviceName) {
     case "products":
@@ -107,7 +111,7 @@ function renderRow(serviceName, item) {
         <tr>
           <td title="${item.name}">${item.name}</td>
           <td>${item.category || "—"}</td>
-          <td>$${Number(item.price).toFixed(2)}</td>
+          <td>LKR ${formatPrice(item.price)}</td>
           <td>${item.stock ?? "—"}</td>
         </tr>`;
 
@@ -125,7 +129,7 @@ function renderRow(serviceName, item) {
         <tr>
           <td title="${item._id}">${item._id?.slice(-8) || "—"}</td>
           <td title="${item.customerId}">${item.customerId?.slice(-8) || "—"}</td>
-          <td>$${Number(item.totalAmount).toFixed(2)}</td>
+          <td>LKR ${formatPrice(item.totalAmount)}</td>
           <td><span class="badge badge-${item.status}">${item.status}</span></td>
         </tr>`;
 
@@ -134,7 +138,7 @@ function renderRow(serviceName, item) {
         <tr>
           <td title="${item._id}">${item._id?.slice(-8) || "—"}</td>
           <td title="${item.orderId}">${item.orderId?.slice(-8) || "—"}</td>
-          <td>$${Number(item.amount).toFixed(2)}</td>
+          <td>LKR ${formatPrice(item.amount)}</td>
           <td><span class="badge badge-${item.status}">${item.status}</span></td>
         </tr>`;
 
