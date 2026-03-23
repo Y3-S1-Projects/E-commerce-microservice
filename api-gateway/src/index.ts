@@ -51,7 +51,7 @@ Object.entries(services).forEach(([pathName, target]) => {
   const proxyOptions: Options = {
     target,
     changeOrigin: true,
-    pathRewrite: (pathStr: string) => pathStr, // Keep the path as-is
+    pathRewrite: (pathStr: string) => `/${pathName}${pathStr}`,
     on: {
       proxyReq: (proxyReq: ClientRequest, req: IncomingMessage) => {
         console.log(
