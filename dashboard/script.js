@@ -29,7 +29,6 @@ async function checkServiceHealth(service) {
     if (response.ok) {
       statusDot.className = "status-dot online";
       statusText.textContent = "Online";
-      statusText.style.color = "#10b981";
       return true;
     }
   } catch (e) {
@@ -38,7 +37,6 @@ async function checkServiceHealth(service) {
 
   statusDot.className = "status-dot offline";
   statusText.textContent = "Offline";
-  statusText.style.color = "#f43f5e";
   return false;
 }
 
